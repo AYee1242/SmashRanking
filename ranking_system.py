@@ -2,7 +2,7 @@ class RankingSystem:
     """A system to compute the next ratings after two players face off in a match"""
 
     def __init__(
-        self, k_factor: int = 32, scale_factor: int = 32, exponent_base: int = 10
+        self, k_factor: int = 32, scale_factor: int = 400, exponent_base: int = 10
     ) -> None:
         """
         Args:
@@ -24,7 +24,7 @@ class RankingSystem:
             float: The probability that a player would win expressed within [0,1]
         """
         exponent = rating_difference / self.scale_factor
-        return 1 / (1 + (self.exponent_base) ^ exponent)
+        return 1 / (1 + (self.exponent_base) ** exponent)
 
     def nextRating(self, cur_rating: int, expected_score: float, score: int) -> int:
         """Computes the next rating of a player
