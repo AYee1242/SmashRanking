@@ -3,3 +3,10 @@ bot-env/
 helper_links.txt
 discord.log
 pyvenv.cfg
+__pycache__/info.cpython-311.pyc
+database/__pycache__/
+cogs/utils/__pycache__/
+bot/__pycache__/
+cogs/__pycache__/
+.DS_Store
+database/database.db
