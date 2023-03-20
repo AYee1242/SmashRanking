@@ -1,5 +1,6 @@
 from discord.ext import commands
 from database.users import Users
+from sqlalchemy import exc
 
 
 class User(commands.Cog):
@@ -8,16 +9,22 @@ class User(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("READY")
+        print("Ready User")
 
-    @commands.command()
-    async def register(self, ctx, in_game_name: str):
+    @commands.command(aliases=["changename"])
+    async def register(self, ctx: commands.Context, in_game_name: str):
         try:
-            await Users.create(id=ctx.message.author.id, in_game_name=in_game_name)
-            await ctx.send("Registration Complete!")
+            id = ctx.message.author.id
+            user = await Users.get(id)
+            if user == None:
+                await Users.create(id=ctx.message.author.id, in_game_name=in_game_name)
+            else:
+                await Users.update(id, in_game_name=in_game_name)
+            await ctx.send(f"Welcome {in_game_name}")
+        except exc.IntegrityError:
+            await ctx.send("A user already chose that name!")
         except Exception as e:
-            print(e)
-            await ctx.send(f"Error creating user: {e}")
+            await ctx.send(f"Error: {e}")
 
 
 # this setup function needs to be in every cog in order for the bot to be able to load it

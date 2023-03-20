@@ -7,7 +7,7 @@ class Users(Base, BaseModel):
     __tablename__ = "users"
     # Create table fields
     id = Column(String(20), primary_key=True)
-    in_game_name = Column(String(250), nullable=False)
+    in_game_name = Column(String(250), nullable=False, unique=True)
     elo = Column(Integer, nullable=False, default=800)
 
     # required in order to access columns with server defaults
