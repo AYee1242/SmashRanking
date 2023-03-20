@@ -10,3 +10,4 @@ bot/__pycache__/
 cogs/__pycache__/
 .DS_Store
 database/database.db
+database/database.db-journal

@@ -1,8 +1,8 @@
 import discord
 from discord.ext.commands import Bot as BotBase
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import async_db_session
+from discord import Embed, DMChannel
+from datetime import datetime
 
 
 COMMAND_PREFIX = "$"
@@ -41,17 +41,5 @@ class Bot(BotBase):
     async def on_ready(self):
         print("ready up")
 
-    async def on_messssage(self, message):
-        pass
 
-
-# bot = commands.Bot(command_prefix="$", description=description, intents=intents)
 bot = Bot()
-
-
-# @bot.event
-# async def on_ready():
-#     print(f"We have logged in as {bot.user}")
-
-
-# bot.run(os.environ.get("BOT_TOKEN"), log_handler=handler, log_level=logging.DEBUG)
