@@ -42,7 +42,7 @@ class UserCog(commands.Cog):
             return
 
         await User.update(id, current_character=character)
-        await ctx.send("Character has updated!")
+        await ctx.send(f"Character updated to {character}")
 
     async def cog_command_error(
         self, ctx: commands.Context, error: commands.CommandError
