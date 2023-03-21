@@ -21,7 +21,7 @@ CHARACTERS = [
     "Princess Zelda",
     "Dr. Mario",
     "Pichu",
-    "Falco Lombardi",
+    "Falco",
     "Marth",
     "Lucina",
     "Young Link",
