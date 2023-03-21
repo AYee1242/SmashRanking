@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 COMMAND_PREFIX = "$"
-COGS = ["info", "user"]
+COGS = ["info_cog", "user_cog", "match_cog"]
 
 
 class Bot(BotBase):

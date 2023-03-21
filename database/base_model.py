@@ -39,9 +39,3 @@ class BaseModel:
         if result is None:
             return result
         return result[0]
-
-    @classmethod
-    async def exists(cls, id):
-        query = select(cls).where(cls.id == id)
-        results = await async_db_session.execute(query)
-        return result
