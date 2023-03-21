@@ -1,10 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
-from sqlalchemy import Column, String, Integer
-from sqlalchemy import update as sqlalchemy_update
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.future import select
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 from .base import Base
 
 
@@ -26,7 +22,7 @@ class AsyncDatabaseSession:
 
     async def create_all(self):
         async with self._engine.begin() as conn:
-            # await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
 

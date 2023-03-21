@@ -1,13 +1,15 @@
 from discord.ext import commands
 from datetime import datetime
-from discord import Embed, Member
+from discord import Embed
 from typing import Optional
-from database.users import Users
+from database.user import User
 from database.database import async_db_session
 from sqlalchemy.future import select
+from database.user_game import UserGame
+from database.game import Game
 
 
-class Info(commands.Cog):
+class InfoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -17,12 +19,12 @@ class Info(commands.Cog):
             user = None
 
             if name is not None:
-                query = select(Users).where(Users.in_game_name == name)
+                query = select(User).where(User.in_game_name == name)
                 result = (await async_db_session.execute(query)).first()
                 user = None if result is None else result[0]
             else:
                 id = ctx.message.author.id
-                user = await Users.get(id)
+                user = await User.get(id)
 
             if user is None:
                 await ctx.send("No information available for this user")
@@ -46,4 +48,4 @@ class Info(commands.Cog):
 
 # this setup function needs to be in every cog in order for the bot to be able to load it
 async def setup(bot):
-    await bot.add_cog(Info(bot))
+    await bot.add_cog(InfoCog(bot))
