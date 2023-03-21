@@ -12,6 +12,7 @@ class User(Base, BaseModel):
     elo = Column(Integer, nullable=False, default=800)
     current_character = Column(String, nullable=True)
     history = relationship("user_game", back_populates="user")
+    character_elos = relationship("character", back_populates="user")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without
