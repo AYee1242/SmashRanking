@@ -9,7 +9,7 @@ class Game(Base, BaseModel):
     # Create table fields
     id = Column(Integer, primary_key=True)
     date = Column(DATE, nullable=False)
-    user_games = relationship("user_game", back_populates="game")
+    user_games = relationship("UserGame", back_populates="game")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without

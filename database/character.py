@@ -6,14 +6,14 @@ import enum
 
 
 class Character(Base, BaseModel):
-    __tablename__ = "user_game"
+    __tablename__ = "character"
     # Create table fields
     character = Column(String, nullable=False, primary_key=True)
     elo = Column(Integer, nullable=False)
     user_id = mapped_column(
         String(20), ForeignKey("user.id"), primary_key=True, nullable=False
     )
-    user = relationship("user", back_populates="history")
+    user = relationship("User", back_populates="character_elos")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without

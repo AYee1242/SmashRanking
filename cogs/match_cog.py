@@ -3,6 +3,7 @@ from datetime import datetime
 from discord import Embed, Member
 from typing import Optional
 from database.user import User
+from database.character import Character
 from database.database import async_db_session
 from sqlalchemy.future import select
 

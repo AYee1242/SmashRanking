@@ -18,9 +18,9 @@ class UserGame(Base, BaseModel):
     elo_change = Column(Integer, nullable=False)
     character = Column(String, nullable=False)
     user_id = mapped_column(String(20), ForeignKey("user.id"), nullable=False)
-    user = relationship("user", back_populates="history")
+    user = relationship("User", back_populates="history")
     game_id = mapped_column(Integer, ForeignKey("game.id"), nullable=False)
-    game = relationship("game", back_populates="user_games")
+    game = relationship("Game", back_populates="user_games")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without
