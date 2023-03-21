@@ -23,10 +23,10 @@ class Character(Base, BaseModel):
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}("
-            f"id={self.id}, "
-            f"game_result={self.game_result.name}, "
-            f"elo_change={self.elo_change}, "
-            f"user_id={self.user_id}, "
-            f"game_id={self.game_id}"
+            f"user={self.user.in_game_name}, "
+            f"character={self.character}, "
+            f"elo={self.elo}, "
+            f"wins={self.wins}"
+            f"loses={self.losses}"
             f")>"
         )
