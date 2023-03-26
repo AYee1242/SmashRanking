@@ -9,12 +9,14 @@ class BaseModel:
         cls,
         **kwargs,
     ):
-        async_db_session.add(cls(**kwargs))
+        obj = cls(**kwargs)
+        async_db_session.add(obj)
         try:
             await async_db_session.commit()
         except Exception as e:
             await async_db_session.rollback()
             raise e
+        return obj
 
     @classmethod
     async def update(cls, id, **kwargs):

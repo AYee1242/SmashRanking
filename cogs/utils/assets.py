@@ -35,7 +35,7 @@ CHARACTERS = [
     "Dark Pit",
     "Zero Suit Samus",
     "Wario",
-    "Solid Snake",
+    "Snake",
     "Ike",
     "Pokémon Trainer",
     "Squirtle",

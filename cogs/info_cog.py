@@ -5,16 +5,19 @@ from typing import Optional
 from database.user import User
 from database.database import async_db_session
 from sqlalchemy.future import select
-from database.user_game import UserGame
+from database.user_game import UserGame, GameResult
+from database.user_character import UserCharacter
 from database.game import Game
 from .utils.assets import CHARACTERS
+from sqlalchemy import desc
+from sqlalchemy.orm import selectinload
 
 
 class InfoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="userinfo", aliases=["memberinfo"])
+    @commands.command(aliases=["memberinfo", "userinfo"])
     async def user_info(self, ctx, name: Optional[str]):
         user = None
 
@@ -50,6 +53,97 @@ class InfoCog(commands.Cog):
     @commands.command()
     async def characters(self, ctx):
         await ctx.send("\n".join(CHARACTERS))
+
+    @commands.command(aliases=["leaderboards"])
+    async def leaderboard(self, ctx):
+        query = select(User).order_by(desc(User.elo))
+        users = (await async_db_session.execute(query)).all()
+        embed = Embed(
+            title=f"User Leaderboards",
+        )
+
+        rank = ""
+        name = ""
+        elo = ""
+
+        for idx, user in enumerate(users):
+            user = user[0]
+            rank += f"{idx+1}\n"
+            name += f"{user.in_game_name}\n"
+            elo += f"{user.elo}\n"
+
+        embed.add_field(name="Rank", value=rank, inline=True)
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="Elo", value=elo, inline=True)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["characterleaderboard, characterleaderboards"])
+    async def character_leaderboard(self, ctx):
+        query = (
+            select(UserCharacter)
+            .order_by(desc(UserCharacter.elo))
+            .options(selectinload(UserCharacter.user))
+        )
+        user_characters = (await async_db_session.execute(query)).all()
+        embed = Embed(
+            title=f"Character Leaderboards",
+        )
+
+        name = ""
+        character = ""
+        elo = ""
+
+        for user_character in user_characters:
+            user_character = user_character[0]
+            name += f"{user_character.user.in_game_name}\n"
+            character += f"{user_character.character}\n"
+            elo += f"{user_character.elo}\n"
+
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="Character", value=character, inline=True)
+        embed.add_field(name="Elo", value=elo, inline=True)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["winrates"])
+    async def win_rates(self, ctx):
+        query = (
+            select(User)
+            .order_by(desc(User.elo))
+            .options(selectinload(User.user_game_history))
+        )
+        users = (await async_db_session.execute(query)).all()
+        embed = Embed(
+            title=f"Win Rates",
+        )
+
+        name = ""
+        win_loss = ""
+        win_rate = ""
+
+        for user in users:
+            user: User = user[0]
+            wins = sum(
+                1
+                for game in user.user_game_history
+                if game.game_result == GameResult.winner
+            )
+            losses = len(user.user_game_history) - wins
+
+            name += f"{user.in_game_name}\n"
+            win_loss += f"{wins}/{losses}\n"
+            win_rate += (
+                f"0%\n"
+                if len(user.user_game_history) == 0
+                else f"{round((wins/(losses + wins)) * 100, 1)}%\n"
+            )
+
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="Win/Loss", value=win_loss, inline=True)
+        embed.add_field(name="Win Rate", value=win_rate, inline=True)
+
+        await ctx.send(embed=embed)
 
     async def cog_command_error(
         self, ctx: commands.Context, error: commands.CommandError

@@ -15,7 +15,8 @@ class UserGame(Base, BaseModel):
     # Create table fields
     id = Column(Integer, primary_key=True)
     game_result = Column(Enum(GameResult), nullable=False)
-    elo_change = Column(Integer, nullable=False)
+    user_elo_change = Column(Integer, nullable=False)
+    character_elo_change = Column(Integer, nullable=False)
     character = Column(String, nullable=False)
     user_id = mapped_column(String(20), ForeignKey("user.id"), nullable=False)
     user = relationship("User", back_populates="user_game_history")

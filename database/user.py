@@ -2,6 +2,8 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 from .base import Base
 from .base_model import BaseModel
+from sqlalchemy.future import select
+from .database import async_db_session
 
 
 class User(Base, BaseModel):
@@ -12,7 +14,7 @@ class User(Base, BaseModel):
     elo = Column(Integer, nullable=False, default=800)
     current_character = Column(String, nullable=True)
     user_game_history = relationship("UserGame", back_populates="user")
-    character_history = relationship("Character", back_populates="user")
+    character_history = relationship("UserCharacter", back_populates="user")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without
@@ -27,3 +29,11 @@ class User(Base, BaseModel):
             f"elo={self.elo}"
             f")>"
         )
+
+    async def get_from_name(in_game_name: str):
+        query = select(User).where(User.in_game_name == in_game_name)
+        results = await async_db_session.execute(query)
+        result = results.first()
+        if result is None:
+            return result
+        return result[0]
