@@ -13,7 +13,7 @@ class Character(Base, BaseModel):
     user_id = mapped_column(
         String(20), ForeignKey("user.id"), primary_key=True, nullable=False
     )
-    user = relationship("User", back_populates="character_elos")
+    user = relationship("User", back_populates="character_history")
 
     # required in order to access columns with server defaults
     # or SQL expression defaults, subsequent to a flush, without

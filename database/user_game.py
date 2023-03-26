@@ -18,7 +18,7 @@ class UserGame(Base, BaseModel):
     elo_change = Column(Integer, nullable=False)
     character = Column(String, nullable=False)
     user_id = mapped_column(String(20), ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="history")
+    user = relationship("User", back_populates="user_game_history")
     game_id = mapped_column(Integer, ForeignKey("game.id"), nullable=False)
     game = relationship("Game", back_populates="user_games")
 
