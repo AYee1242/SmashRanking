@@ -136,7 +136,7 @@ class MatchCog(commands.Cog):
             raise e
 
         # create the game instance
-        game = await Game.create(date=datetime.now(), winner=winner.id, loser=loser.id)
+        game = await Game.create(date=datetime.now())
         await UserGame.create(
             game_result=GameResult.winner,
             user_elo_change=winner_user_rating_change,
