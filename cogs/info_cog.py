@@ -294,6 +294,7 @@ class InfoCog(commands.Cog):
 
             character += f"{user_game.character}\n"
             vs += f"{vs_user_game.user.in_game_name}-{vs_user_game.character}\n"
+            elo += "+" if user_game.game_result == GameResult.winner else ""
             elo += f"{user_game.user_elo_change}\n"
 
         embed.add_field(name="Character", value=character, inline=True)

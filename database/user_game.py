@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, Enum, BIGINT
 from sqlalchemy.orm import relationship, mapped_column
 from .base import Base
 from .base_model import BaseModel
@@ -18,7 +18,7 @@ class UserGame(Base, BaseModel):
     user_elo_change = Column(Integer, nullable=False)
     character_elo_change = Column(Integer, nullable=False)
     character = Column(String, nullable=False)
-    user_id = mapped_column(String(20), ForeignKey("user.id"), nullable=False)
+    user_id = mapped_column(BIGINT, ForeignKey("user.id"), nullable=False)
     user = relationship("User", back_populates="user_game_history")
     game_id = mapped_column(Integer, ForeignKey("game.id"), nullable=False)
     game = relationship("Game", back_populates="user_games")

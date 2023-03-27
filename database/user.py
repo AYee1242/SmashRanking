@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, BIGINT, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .base import Base
 from .base_model import BaseModel
@@ -9,7 +9,8 @@ from .database import async_db_session
 class User(Base, BaseModel):
     __tablename__ = "user"
     # Create table fields
-    id = Column(String(20), primary_key=True)
+    id = Column(BIGINT, primary_key=True)
+    guild_id = Column(BIGINT, nullable=False)
     in_game_name = Column(String(250), nullable=False, unique=True)
     elo = Column(Integer, nullable=False, default=800)
     current_character = Column(String, nullable=True)
@@ -20,6 +21,8 @@ class User(Base, BaseModel):
     # or SQL expression defaults, subsequent to a flush, without
     # triggering an expired load
     __mapper_args__ = {"eager_defaults": True}
+
+    __table_args__ = (UniqueConstraint("guild_id", "in_game_name", name="_name_guild"),)
 
     def __repr__(self):
         return (

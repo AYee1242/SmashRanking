@@ -39,7 +39,7 @@ class Bot(BotBase):
         print("bot disconnected")
 
     async def on_ready(self):
-        print("ready up")
+        print("ready Bot")
 
 
 bot = Bot()
