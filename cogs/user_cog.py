@@ -12,8 +12,18 @@ class UserCog(commands.Cog):
     async def on_ready(self):
         print("Ready User")
 
-    @commands.command(aliases=["changename", "changeName", "change_name"])
-    async def register(self, ctx: commands.Context, in_game_name: str):
+    @commands.command(
+        alias=["change_name", "changeName"],
+        brief="Register/change in game name",
+        description="Register/change the user's in game name",
+    )
+    async def register(
+        self,
+        ctx: commands.Context,
+        in_game_name: str = commands.parameter(
+            description="The user's unique in game name"
+        ),
+    ):
         try:
             id = ctx.message.author.id
             user = await User.get(id)
@@ -25,8 +35,16 @@ class UserCog(commands.Cog):
         except exc.IntegrityError:
             await ctx.send("A user already chose that name!")
 
-    @commands.command(aliases=["set", "setcharacter", "setCharacter"])
-    async def set_character(self, ctx: commands.Context, character: str):
+    @commands.command(
+        aliases=["set", "setcharacter", "setCharacter"],
+        brief="Set default character",
+        description="set default character to use when match is processed and no character is given. Use $characters to view playable characters",
+    )
+    async def set_character(
+        self,
+        ctx: commands.Context,
+        character: str = commands.parameter(description="Default character to use"),
+    ):
         id = ctx.message.author.id
         user = await User.get(id)
         if user == None:

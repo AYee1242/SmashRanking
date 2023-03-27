@@ -19,8 +19,22 @@ class InfoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["memberinfo", "userinfo"])
-    async def user_info(self, ctx, name: Optional[str]):
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Ready Info")
+
+    @commands.command(
+        aliases=["memberinfo", "userinfo"],
+        brief="Display user info",
+        description="Displays user in game name, current character and elo",
+    )
+    async def user_info(
+        self,
+        ctx,
+        name: Optional[str] = commands.parameter(
+            default="The caller", description="The in game name of the user"
+        ),
+    ):
         user = None
 
         if name is not None:
@@ -52,11 +66,18 @@ class InfoCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(
+        brief="Displays playable characters",
+        description="Displays all characters that users can use",
+    )
     async def characters(self, ctx):
-        await ctx.send("\n".join(CHARACTERS))
+        await ctx.send(", ".join(CHARACTERS))
 
-    @commands.command(aliases=["leaderboards"])
+    @commands.command(
+        aliases=["leaderboards"],
+        brief="Player rankings",
+        description="Prints out user rankings based off of elo",
+    )
     async def leaderboard(self, ctx):
         query = select(User).order_by(desc(User.elo))
         users = (await async_db_session.execute(query)).all()
@@ -80,7 +101,11 @@ class InfoCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["characterleaderboard, characterleaderboards"])
+    @commands.command(
+        aliases=["characterleaderboard, characterleaderboards"],
+        brief="Character rankings",
+        description="Prints out character rankings based off of character elo",
+    )
     async def character_leaderboard(self, ctx):
         query = (
             select(UserCharacter)
@@ -108,7 +133,11 @@ class InfoCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["winrates"])
+    @commands.command(
+        aliases=["winrates"],
+        brief="Player win rates",
+        description="Prints out all player win rates",
+    )
     async def win_rates(self, ctx):
         query = (
             select(User)
@@ -147,8 +176,19 @@ class InfoCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["winrate"])
-    async def win_rate(self, ctx, name: Optional[str]):
+    @commands.command(
+        aliases=["winrate"],
+        brief="Individual character win rates",
+        description="Prints out character win rates for a specified player",
+    )
+    async def win_rate(
+        self,
+        ctx,
+        name: Optional[str] = commands.parameter(
+            default="The caller",
+            description="The in game name of the player to display",
+        ),
+    ):
         user = None
 
         if name is None:

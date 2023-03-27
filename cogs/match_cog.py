@@ -11,19 +11,31 @@ from .utils.ranking_system import RankingSystem
 from .utils.assets import CHARACTERS
 
 
-class Info(commands.Cog):
+class MatchCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ranking_system = RankingSystem()
 
-    @commands.command(aliases=["game", "processgame", "processmatch"])
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Ready Match")
+
+    @commands.command(
+        aliases=["game", "processgame", "processmatch"],
+        brief="Process smash game",
+        description="Logs a smash game and updates elo for users and characters",
+    )
     async def process_match(
         self,
         ctx,
-        winner_name,
-        loser_name,
-        winner_character: Optional[str],
-        loser_character: Optional[str],
+        winner_name=commands.parameter(description="Winner's in game name"),
+        loser_name=commands.parameter(description="Loser's in game name"),
+        winner_character: Optional[str] = commands.parameter(
+            default="Winner's predefined character", description="Winner's character"
+        ),
+        loser_character: Optional[str] = commands.parameter(
+            default="Loser's predefined character", description="Loser's character"
+        ),
     ):
         winner, loser = await User.get_from_name(winner_name), await User.get_from_name(
             loser_name
@@ -155,4 +167,4 @@ class Info(commands.Cog):
 
 # this setup function needs to be in every cog in order for the bot to be able to load it
 async def setup(bot):
-    await bot.add_cog(Info(bot))
+    await bot.add_cog(MatchCog(bot))

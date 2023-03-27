@@ -47,7 +47,7 @@ CHARACTERS = [
     "King Dedede",
     "Pikmin and Olimar",
     "Lucario",
-    "R.O.B.",
+    "ROB.",
     "Toon Link",
     "Wolf",
     "Villager",
