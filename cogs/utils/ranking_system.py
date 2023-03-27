@@ -14,7 +14,7 @@ class RankingSystem:
         self.scale_factor = scale_factor
         self.exponent_base = exponent_base
 
-    def expectedPlayerScore(self, rating_difference: int) -> float:
+    def expected_player_score(self, rating_difference: int) -> float:
         """Computes the probability that a player would win
 
         Args:
@@ -26,7 +26,7 @@ class RankingSystem:
         exponent = rating_difference / self.scale_factor
         return 1 / (1 + (self.exponent_base) ** exponent)
 
-    def nextRating(self, cur_rating: int, expected_score: float, score: int) -> int:
+    def rating_change(self, cur_rating: int, expected_score: float, score: int) -> int:
         """Computes the next rating of a player
 
         Args:
@@ -38,9 +38,9 @@ class RankingSystem:
             int: the new rating of the player
         """
         delta = round(self.k_factor * (score - expected_score))
-        return cur_rating + delta
+        return delta
 
-    def computeNextRatings(
+    def compute_next_ratings(
         self, winner_rating: int, loser_rating: int
     ) -> tuple[int, int]:
         """Determines the next ratings between two players
@@ -55,10 +55,12 @@ class RankingSystem:
         winner_rating_diff = loser_rating - winner_rating
         loser_rating_diff = winner_rating - loser_rating
 
-        expected_winner_score = self.expectedPlayerScore(winner_rating_diff)
-        expected_loser_score = self.expectedPlayerScore(loser_rating_diff)
+        expected_winner_score = self.expected_player_score(winner_rating_diff)
+        expected_loser_score = self.expected_player_score(loser_rating_diff)
 
-        new_winner_rating = self.nextRating(winner_rating, expected_winner_score, 1)
-        new_loser_rating = self.nextRating(loser_rating, expected_loser_score, 0)
+        winner_rating_change = self.rating_change(
+            winner_rating, expected_winner_score, 1
+        )
+        loser_rating_change = self.rating_change(loser_rating, expected_loser_score, 0)
 
-        return new_winner_rating, new_loser_rating
+        return winner_rating_change, loser_rating_change
