@@ -28,7 +28,12 @@ class UserCog(commands.Cog):
             id = ctx.message.author.id
             user = await User.get(id)
             if user == None:
-                await User.create(id=ctx.message.author.id, in_game_name=in_game_name)
+                guild_id = ctx.guild.id
+                await User.create(
+                    id=ctx.message.author.id,
+                    guild_id=guild_id,
+                    in_game_name=in_game_name,
+                )
             else:
                 await User.update(id, in_game_name=in_game_name)
             await ctx.send(f"Welcome {in_game_name}")
