@@ -7,7 +7,6 @@ from database.database import async_db_session
 from sqlalchemy.future import select
 from database.user_game import UserGame, GameResult
 from database.user_character import UserCharacter
-from database.game import Game
 from .utils.assets import CHARACTERS
 from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
@@ -32,7 +31,7 @@ class InfoCog(commands.Cog):
         self,
         ctx,
         name: Optional[str] = commands.parameter(
-            default="The caller", description="The in game name of the user"
+            description="The in game name of the user. If left blank will use the caller"
         ),
     ):
         user = None
@@ -80,7 +79,7 @@ class InfoCog(commands.Cog):
     )
     async def leaderboard(self, ctx):
         query = select(User).order_by(desc(User.elo))
-        users = (await async_db_session.execute(query)).all()
+        users = (await async_db_session.execute(query)).scalars()
         embed = Embed(
             title=f"User Leaderboards",
         )
@@ -90,7 +89,6 @@ class InfoCog(commands.Cog):
         elo = ""
 
         for idx, user in enumerate(users):
-            user = user[0]
             rank += f"{idx+1}\n"
             name += f"{user.in_game_name}\n"
             elo += f"{user.elo}\n"
@@ -144,7 +142,8 @@ class InfoCog(commands.Cog):
             .order_by(desc(User.elo))
             .options(selectinload(User.user_game_history))
         )
-        users = (await async_db_session.execute(query)).all()
+        users = (await async_db_session.execute(query)).scalars()
+
         embed = Embed(
             title=f"Win Rates",
         )
@@ -154,7 +153,6 @@ class InfoCog(commands.Cog):
         win_rate = ""
 
         for user in users:
-            user: User = user[0]
             wins = sum(
                 1
                 for game in user.user_game_history
@@ -185,8 +183,7 @@ class InfoCog(commands.Cog):
         self,
         ctx,
         name: Optional[str] = commands.parameter(
-            default="The caller",
-            description="The in game name of the player to display",
+            description="The in game name of the player to display. If left blank will use the caller",
         ),
     ):
         user = None
@@ -235,6 +232,73 @@ class InfoCog(commands.Cog):
         embed.add_field(name="Character", value=characters, inline=True)
         embed.add_field(name="Win/Loss", value=win_loss, inline=True)
         embed.add_field(name="Win Rate", value=win_rate, inline=True)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(
+        aliases=["matchHistory"],
+        brief="Player match history",
+        description="Prints out the last 50 games for a player sorted by date",
+    )
+    async def match_history(
+        self,
+        ctx,
+        name: Optional[str] = commands.parameter(
+            description="The in game name of the player to view. If left blank, will use the caller"
+        ),
+    ):
+        query = None
+        print(name)
+        if name is None:
+            query = (
+                select(User)
+                .where(User.id == ctx.message.author.id)
+                .limit(50)
+                .options(selectinload(User.user_game_history))
+            )
+        else:
+            query = (
+                select(User)
+                .where(User.in_game_name == name)
+                .limit(50)
+                .options(selectinload(User.user_game_history))
+            )
+        user = (await async_db_session.execute(query)).scalar()
+
+        if user is None:
+            await ctx.send("Player not found")
+            return
+
+        embed = Embed(
+            title=f"Match History {user.in_game_name}",
+        )
+
+        character = ""
+        vs = ""
+        elo = ""
+
+        for user_game in user.user_game_history:
+            query = (
+                select(UserGame)
+                .where(
+                    (UserGame.game_id == user_game.game_id)
+                    & (UserGame.user_id != user.id)
+                )
+                .options(selectinload(UserGame.user))
+            )
+
+            vs_user_game = (await async_db_session.execute(query)).scalar()
+
+            if vs_user_game is None:
+                continue
+
+            character += f"{user_game.character}\n"
+            vs += f"{vs_user_game.user.in_game_name}-{vs_user_game.character}\n"
+            elo += f"{user_game.user_elo_change}\n"
+
+        embed.add_field(name="Character", value=character, inline=True)
+        embed.add_field(name="VS", value=vs, inline=True)
+        embed.add_field(name="Elo", value=elo, inline=True)
 
         await ctx.send(embed=embed)
 

@@ -31,10 +31,10 @@ class MatchCog(commands.Cog):
         winner_name=commands.parameter(description="Winner's in game name"),
         loser_name=commands.parameter(description="Loser's in game name"),
         winner_character: Optional[str] = commands.parameter(
-            default="Winner's predefined character", description="Winner's character"
+            description="Winner's character. If left blank will use the winner's predefined character"
         ),
         loser_character: Optional[str] = commands.parameter(
-            default="Loser's predefined character", description="Loser's character"
+            description="Loser's character. If left blank will use the loser's predefined character"
         ),
     ):
         winner, loser = await User.get_from_name(winner_name), await User.get_from_name(
@@ -136,7 +136,7 @@ class MatchCog(commands.Cog):
             raise e
 
         # create the game instance
-        game = await Game.create(date=datetime.now())
+        game = await Game.create(date=datetime.now(), winner=winner.id, loser=loser.id)
         await UserGame.create(
             game_result=GameResult.winner,
             user_elo_change=winner_user_rating_change,
