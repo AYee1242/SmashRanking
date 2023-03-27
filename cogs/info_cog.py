@@ -11,6 +11,8 @@ from database.game import Game
 from .utils.assets import CHARACTERS
 from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
+from itertools import groupby
+from operator import attrgetter
 
 
 class InfoCog(commands.Cog):
@@ -86,10 +88,6 @@ class InfoCog(commands.Cog):
             .options(selectinload(UserCharacter.user))
         )
         user_characters = (await async_db_session.execute(query)).all()
-        embed = Embed(
-            title=f"Character Leaderboards",
-        )
-
         name = ""
         character = ""
         elo = ""
@@ -99,6 +97,10 @@ class InfoCog(commands.Cog):
             name += f"{user_character.user.in_game_name}\n"
             character += f"{user_character.character}\n"
             elo += f"{user_character.elo}\n"
+
+        embed = Embed(
+            title=f"Character Leaderboards",
+        )
 
         embed.add_field(name="Name", value=name, inline=True)
         embed.add_field(name="Character", value=character, inline=True)
@@ -140,6 +142,57 @@ class InfoCog(commands.Cog):
             )
 
         embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="Win/Loss", value=win_loss, inline=True)
+        embed.add_field(name="Win Rate", value=win_rate, inline=True)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["winrate"])
+    async def win_rate(self, ctx, name: Optional[str]):
+        user = None
+
+        if name is None:
+            user = await User.get(ctx.message.author.id)
+        else:
+            user = await User.get_from_name(name)
+
+        if user is None:
+            await ctx.send("User not found")
+            return
+
+        query = (
+            select(UserGame)
+            .where(UserGame.user_id == user.id)
+            .order_by(UserGame.character)
+        )
+
+        user_games = (await async_db_session.execute(query)).scalars().all()
+
+        # Materialize the subiterators to lists
+        characters_dict = {
+            k: list(g) for k, g in groupby(user_games, attrgetter("character"))
+        }
+        embed = Embed(
+            title=f"{user.in_game_name} Win Rates",
+        )
+
+        characters = ""
+        win_loss = ""
+        win_rate = ""
+
+        for character, games in characters_dict.items():
+            wins = sum(1 for game in games if game.game_result == GameResult.winner)
+            losses = len(games) - wins
+
+            characters += f"{character}\n"
+            win_loss += f"{wins}/{losses}\n"
+            win_rate += (
+                f"0%\n"
+                if len(games) == 0
+                else f"{round((wins/(losses + wins)) * 100, 1)}%\n"
+            )
+
+        embed.add_field(name="Character", value=characters, inline=True)
         embed.add_field(name="Win/Loss", value=win_loss, inline=True)
         embed.add_field(name="Win Rate", value=win_rate, inline=True)
 
