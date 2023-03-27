@@ -64,13 +64,13 @@ class MatchCog(commands.Cog):
                 return
             loser_character = loser.current_character
 
-        if winner_character.capitalize() not in CHARACTERS:
+        if winner_character.title() not in CHARACTERS:
             await ctx.send(
                 "Winner character does not exist, check playable characters with $characters"
             )
             return
 
-        if loser_character.capitalize() not in CHARACTERS:
+        if loser_character.title() not in CHARACTERS:
             await ctx.send(
                 "Loser character does not exist, check playable characters with $characters"
             )

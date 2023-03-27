@@ -53,7 +53,7 @@ class UserCog(commands.Cog):
             )
             return
 
-        if character.capitalize() not in CHARACTERS:
+        if character.title() not in CHARACTERS:
             await ctx.send(
                 "Character does not exist, check playable characters with $characters"
             )
