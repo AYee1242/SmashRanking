@@ -76,22 +76,22 @@ class MatchCog(commands.Cog):
             )
             return
 
-        members = {int(winner.id), int(loser.id)}
         needed_members = {int(winner.id), int(loser.id)}
         cancel_process = False
 
         def check(reaction, user):  # Our check for the reaction
             nonlocal cancel_process
-            if user.id in members:
-                if str(reaction.emoji) == "❌":
-                    cancel_process = True
-                    return True
-                if str(reaction.emoji) == "✅":
-                    if user.id in needed_members:
-                        needed_members.remove(user.id)
-                        if len(needed_members) == 0:
-                            return True
-            return False
+            if user.id not in needed_members:
+                return False
+
+            if str(reaction.emoji) == "❌":
+                cancel_process = True
+                return True
+
+            if str(reaction.emoji) == "✅":
+                needed_members.remove(user.id)
+
+            return len(needed_members) == 0
 
         msg = await ctx.send(
             f"Please confirm that {winner_name} as {winner_character} beat {loser_name} as {loser_character}"
