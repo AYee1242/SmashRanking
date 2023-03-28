@@ -236,7 +236,7 @@ class InfoCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        aliases=["matchHistory"],
+        aliases=["matchHistory", "matchhistory"],
         brief="Player match history",
         description="Prints out the last 50 games for a player sorted by date",
     )
@@ -248,19 +248,16 @@ class InfoCog(commands.Cog):
         ),
     ):
         query = None
-        print(name)
         if name is None:
             query = (
                 select(User)
                 .where(User.id == ctx.message.author.id)
-                .limit(50)
                 .options(selectinload(User.user_game_history))
             )
         else:
             query = (
                 select(User)
                 .where(User.in_game_name == name)
-                .limit(50)
                 .options(selectinload(User.user_game_history))
             )
         user = (await async_db_session.execute(query)).scalar()
@@ -276,8 +273,7 @@ class InfoCog(commands.Cog):
         character = ""
         vs = ""
         elo = ""
-
-        for user_game in user.user_game_history:
+        for user_game in user.user_game_history[::-1]:
             query = (
                 select(UserGame)
                 .where(
