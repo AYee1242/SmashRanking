@@ -152,7 +152,7 @@ class InfoCog(commands.Cog):
         win_loss = ""
         win_rate = ""
 
-        for user in users:
+        for idx, user in enumerate(users):
             wins = sum(
                 1
                 for game in user.user_game_history
@@ -160,8 +160,8 @@ class InfoCog(commands.Cog):
             )
             losses = len(user.user_game_history) - wins
 
-            name += f"{user.in_game_name}\n"
-            win_loss += f"{wins}/{losses}\n"
+            name += f"{idx+1}. {user.in_game_name}\n"
+            win_loss += f"{wins}-{losses}\n"
             win_rate += (
                 f"0%\n"
                 if len(user.user_game_history) == 0
@@ -169,7 +169,7 @@ class InfoCog(commands.Cog):
             )
 
         embed.add_field(name="Name", value=name, inline=True)
-        embed.add_field(name="Win/Loss", value=win_loss, inline=True)
+        embed.add_field(name="Win-Loss", value=win_loss, inline=True)
         embed.add_field(name="Win Rate", value=win_rate, inline=True)
 
         await ctx.send(embed=embed)

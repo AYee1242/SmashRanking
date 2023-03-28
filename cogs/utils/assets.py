@@ -89,4 +89,5 @@ CHARACTERS = [
     "Pyra/Mythra",
     "Kazuya",
     "Sora",
+    "Random",
 ]
