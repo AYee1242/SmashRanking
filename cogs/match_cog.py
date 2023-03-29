@@ -75,13 +75,14 @@ class MatchCog(commands.Cog):
                 "Loser character does not exist, check playable characters with $characters"
             )
             return
-
-        needed_members = {int(winner.id), int(loser.id)}
+        needed_member = (
+            int(winner.id) if ctx.message.author.id == int(loser.id) else int(loser.id)
+        )
         cancel_process = False
 
         def check(reaction, user):  # Our check for the reaction
             nonlocal cancel_process
-            if user.id not in needed_members:
+            if user.id != needed_member:
                 return False
 
             if str(reaction.emoji) == "❌":
@@ -89,9 +90,8 @@ class MatchCog(commands.Cog):
                 return True
 
             if str(reaction.emoji) == "✅":
-                needed_members.remove(user.id)
-
-            return len(needed_members) == 0
+                return True
+            return False
 
         msg = await ctx.send(
             f"Please confirm that {winner_name} as {winner_character} beat {loser_name} as {loser_character}"
