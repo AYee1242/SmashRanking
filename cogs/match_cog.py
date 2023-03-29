@@ -1,3 +1,4 @@
+import asyncio
 from discord.ext import commands
 from datetime import datetime
 from discord import Embed, Member
@@ -95,9 +96,9 @@ class MatchCog(commands.Cog):
 
         msg = await ctx.send(
             f"Please confirm that {winner_name} as {winner_character} beat {loser_name} as {loser_character}"
-        )  # Message to react to
-        await msg.add_reaction("✅")
-        await msg.add_reaction("❌")
+        )
+        # Message to react to
+        await asyncio.gather(msg.add_reaction("✅"), msg.add_reaction("❌"))
         await self.bot.wait_for("reaction_add", check=check)  # Wait for a reaction
 
         if cancel_process:
