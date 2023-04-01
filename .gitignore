@@ -11,3 +11,5 @@ cogs/__pycache__/
 .DS_Store
 database/database.db
 database/database.db-journal
+migrations
+alembic.ini

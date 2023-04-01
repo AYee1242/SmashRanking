@@ -73,6 +73,36 @@ class UserCog(commands.Cog):
         await ctx.send(f"Error with user cog: {error}")
         raise error
 
+    @commands.command(
+        alias=["setviewable", "set_viewable", "setViewable"],
+        brief="Determines if the user will show up on info commands",
+        description="Determines if the user will show up on info commands",
+    )
+    async def viewable(
+        self,
+        ctx: commands.Context,
+        viewable: bool = commands.parameter(
+            description="If the user will show up on info commands", default=False
+        ),
+    ):
+        id = ctx.message.author.id
+        user = await User.get(id)
+        if user == None:
+            ctx.send("User does not exist")
+            return
+        await User.update(id, viewable=viewable)
+
+        if viewable:
+            await ctx.send(f"{user.in_game_name} is now viewable")
+        else:
+            await ctx.send(f"{user.in_game_name} is now not viewable")
+
+    async def cog_command_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ):
+        await ctx.send(f"Error with user cog: {error}")
+        raise error
+
 
 # this setup function needs to be in every cog in order for the bot to be able to load it
 async def setup(bot):

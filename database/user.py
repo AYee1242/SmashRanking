@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, BIGINT, UniqueConstraint
+from sqlalchemy import Column, String, Integer, BIGINT, UniqueConstraint, Boolean, true
 from sqlalchemy.orm import relationship
 from .base import Base
 from .base_model import BaseModel
@@ -14,6 +14,7 @@ class User(Base, BaseModel):
     in_game_name = Column(String(250), nullable=False, unique=True)
     elo = Column(Integer, nullable=False, default=800)
     current_character = Column(String, nullable=True)
+    viewable = Column(Boolean, nullable=False, default=True, server_default=true())
     user_game_history = relationship("UserGame", back_populates="user")
     character_history = relationship("UserCharacter", back_populates="user")
 

@@ -78,7 +78,7 @@ class InfoCog(commands.Cog):
         description="Prints out user rankings based off of elo",
     )
     async def leaderboard(self, ctx):
-        query = select(User).order_by(desc(User.elo))
+        query = select(User).where(User.viewable == True).order_by(desc(User.elo))
         users = (await async_db_session.execute(query)).scalars()
         embed = Embed(
             title=f"User Leaderboards",
@@ -100,7 +100,11 @@ class InfoCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        aliases=["characterleaderboard, characterleaderboards"],
+        aliases=[
+            "characterleaderboard",
+            "characterleaderboards",
+            "character_leaderboards",
+        ],
         brief="Character rankings",
         description="Prints out character rankings based off of character elo",
     )
@@ -110,13 +114,14 @@ class InfoCog(commands.Cog):
             .order_by(desc(UserCharacter.elo))
             .options(selectinload(UserCharacter.user))
         )
-        user_characters = (await async_db_session.execute(query)).all()
+        user_characters = (await async_db_session.execute(query)).scalars()
         name = ""
         character = ""
         elo = ""
 
         for user_character in user_characters:
-            user_character = user_character[0]
+            if user_character.user.viewable is False:
+                continue
             name += f"{user_character.user.in_game_name}\n"
             character += f"{user_character.character}\n"
             elo += f"{user_character.elo}\n"
@@ -139,6 +144,7 @@ class InfoCog(commands.Cog):
     async def win_rates(self, ctx):
         query = (
             select(User)
+            .where(User.viewable == True)
             .order_by(desc(User.elo))
             .options(selectinload(User.user_game_history))
         )
